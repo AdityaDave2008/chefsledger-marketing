@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chef's Ledger | Food Costing and Kitchen Operations</title>
+  <meta
+    name="description"
+    content="Chef's Ledger helps chefs and food businesses track recipes, food cost, inventory, and profit in one place."
+  />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --line: rgba(255,255,255,0.08);
+      --brand: #f97316;
+      --brand-dark: #ea580c;
+      --accent: #22c55e;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      border-color: var(--line);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      background: rgba(15, 23, 42, 0.78);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 74px;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand), #fb923c);
+      color: white;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .hero {
+      padding: 88px 0 60px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(249,115,22,0.35);
+      background: rgba(249,115,22,0.12);
+      color: #fdba74;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4.6rem);
+      line-height: 1.03;
+      letter-spacing: -1.8px;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 640px;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hero-stats strong {
+      color: white;
+      display: block;
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .dashboard {
+      background: linear-gradient(180deg, #111827, #0b1220);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .dashboard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.12);
+      color: #86efac;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .metric {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .metric-note {
+      font-size: 0.9rem;
+      color: #86efac;
+    }
+
+    section {
+      padding: 42px 0;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 28px;
+    }
+
+    .section-head span {
+      color: #fdba74;
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1.08;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card,
+    .pricing-card,
+    .testimonial,
+    .faq-item,
+    .cta-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(249,115,22,0.12);
+      color: #fdba74;
+      font-size: 1.35rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3,
+    .pricing-card h3,
+    .testimonial h3,
+    .faq-item h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p,
+    .pricing-card p,
+    .testimonial p,
+    .faq-item p,
+    .pricing-list li {
+      color: var(--muted);
+    }
+
+    .feature-list,
+    .pricing-list {
+      list-style: none;
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .feature-list li,
+    .pricing-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .check {
+      color: #86efac;
+      font-weight: 900;
+      margin-top: 1px;
+    }
+
+    .showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .showcase-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .showcase-card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+
+    .showcase-card p {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .mini-ui {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .mini-row strong {
+      color: white;
+    }
+
+    .pricing-grid,
+    .testimonial-grid,
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .pricing-card.featured {
+      border-color: rgba(249,115,22,0.35);
+      transform: translateY(-8px);
+    }
+
+    .price {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin: 12px 0 4px;
+    }
+
+    .price small {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(249,115,22,0.12);
+      color: #fdba74;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .testimonial p {
+      margin-bottom: 18px;
+    }
+
+    .person {
+      color: white;
+      font-weight: 700;
+    }
+
+    .role {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .cta-box {
+      padding: 34px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(249,115,22,0.16), rgba(255,255,255,0.04));
+    }
+
+    .cta-box h2 {
+      margin-bottom: 14px;
+    }
+
+    .cta-box p {
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto 22px;
+    }
+
+    footer {
+      padding: 28px 0 42px;
+      color: var(--muted);
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .feature-grid,
+      .showcase,
+      .pricing-grid,
+      .testimonial-grid,
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding-top: 64px;
+      }
+
+      h1 {
+        letter-spacing: -1px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .cta-box {
+        padding: 26px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="#top" class="brand">
+        <div class="brand-mark">CL</div>
+        <span>Chef's Ledger</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a class="btn btn-primary" href="#cta">Start Free</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Built for chefs, caterers, and food operators</div>
+          <h1>Run your kitchen with numbers you trust.</h1>
+          <p>
+            Chef's Ledger gives you recipe costing, menu pricing, inventory tracking,
+            and margin visibility in one clean workspace. Stop guessing food cost.
+            Start pricing with confidence.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cta">Get Early Access</a>
+            <a class="btn btn-secondary" href="#features">See Features</a>
+          </div>
+
+          <div class="hero-stats">
+            <div>
+              <strong>Food cost</strong>
+              Track ingredient cost down to each portion
+            </div>
+            <div>
+              <strong>Menu pricing</strong>
+              Set target margin before dishes go live
+            </div>
+            <div>
+              <strong>Inventory</strong>
+              Stay ahead of waste and stock swings
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="dashboard">
+            <div class="dashboard-top">
+              <span>Kitchen Dashboard</span>
+              <span class="pill">Margin Healthy</span>
+            </div>
+
+            <div class="dashboard-grid">
+              <div class="metric">
+                <div class="metric-label">Average food cost</div>
+                <div class="metric-value">28.4%</div>
+                <div class="metric-note">Down 3.2% this month</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-label">Top margin item</div>
+                <div class="metric-value">Short Rib Bowl</div>
+                <div class="metric-note">$11.20 gross profit</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-label">Inventory alerts</div>
+                <div class="metric-value">6</div>
+                <div class="metric-note">Low stock and price shifts</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-label">Recipe count</div>
+                <div class="metric-value">124</div>
+                <div class="metric-note">Standardized across locations</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-head">
+          <span>Core features</span>
+          <h2>Everything you need to manage food cost and kitchen performance.</h2>
+          <p>
+            Chef's Ledger helps your team move from spreadsheets and rough estimates
+            to structured costing and daily control.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">1</div>
+            <h3>Recipe costing</h3>
+            <p>
+              Build recipes with exact ingredients, yields, portions, and prep loss.
+              See true cost per dish in seconds.
+            </p>
+            <ul class="feature-list">
+              <li><span class="check">✓</span><span>Ingredient-level cost tracking</span></li>
+              <li><span class="check">✓</span><span>Yield and waste adjustments</span></li>
+              <li><span class="check">✓</span><span>Per portion profit breakdown</span></li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">2</div>
+            <h3>Menu pricing</h3>
+            <p>
+              Price dishes using target margins, labor assumptions, and updated ingredient data.
+            </p>
+            <ul class="feature-list">
+              <li><span class="check">✓</span><span>Target margin pricing</span></li>
+              <li><span class="check">✓</span><span>Price change impact view</span></li>
+              <li><span class="check">✓</span><span>Fast menu engineering</span></li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">3</div>
+            <h3>Inventory control</h3>
+            <p>
+              Keep stock counts organized. Spot variance early. Reduce dead stock and waste.
+            </p>
+            <ul class="feature-list">
+              <li><span class="check">✓</span><span>Stock count visibility</span></li>
+              <li><span class="check">✓</span><span>Low inventory alerts</span></li>
+              <li><span class="check">✓</span><span>Usage trend tracking</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <span>How it works</span>
+          <h2>Simple workflow. Strong cost control.</h2>
+          <p>
+            Built for busy operators who need fast answers without bloated software.
+          </p>
+        </div>
+
+        <div class="showcase">
+          <article class="showcase-card">
+            <h3>Add ingredients and vendor pricing</h3>
+            <p>
+              Enter unit cost, pack size, trim loss, and supplier details once. Chef's Ledger converts raw purchase data into usable kitchen numbers.
+            </p>
+            <div class="mini-ui">
+              <div class="mini-row"><span>Chicken thigh</span><strong>$3.92 / lb</strong></div>
+              <div class="mini-row"><span>Jasmine rice</span><strong>$1.18 / lb</strong></div>
+              <div class="mini-row"><span>Gochujang glaze</span><strong>$0.64 / serving</strong></div>
+            </div>
+          </article>
+
+          <article class="showcase-card">
+            <h3>Build recipes and price the menu</h3>
+            <p>
+              Combine ingredients into dishes. Review cost per serving, suggested selling price, and projected gross margin before launch.
+            </p>
+            <div class="mini-ui">
+              <div class="mini-row"><span>Cost per serving</span><strong>$5.80</strong></div>
+              <div class="mini-row"><span>Suggested menu price</span><strong>$18.00</strong></div>
+              <div class="mini-row"><span>Gross margin</span><strong>67.8%</strong></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <span>Pricing</span>
+          <h2>Start lean. Scale when your operation grows.</h2>
+          <p>
+            Replace these sample plans with your final pricing before launch.
+          </p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="pricing-card">
+            <h3>Starter</h3>
+            <div class="price">$0 <small>/ month</small></div>
+            <p>For solo chefs testing recipe costing and menu planning.</p>
+            <ul class="pricing-list">
+              <li><span class="check">✓</span><span>Up to 25 recipes</span></li>
+              <li><span class="check">✓</span><span>Basic costing tools</span></li>
+              <li><span class="check">✓</span><span>1 user</span></li>
+            </ul>
+          </article>
+
+          <article class="pricing-card featured">
+            <span class="tag">Most popular</span>
+            <h3>Pro</h3>
+            <div class="price">$29 <small>/ month</small></div>
+            <p>For growing kitchens that need tighter food cost control.</p>
+            <ul class="pricing-list">
+              <li><span class="check">✓</span><span>Unlimited recipes</span></li>
+              <li><span class="check">✓</span><span>Inventory tracking</span></li>
+              <li><span class="check">✓</span><span>Menu pricing tools</span></li>
+              <li><span class="check">✓</span><span>Up to 5 users</span></li>
+            </ul>
+          </article>
+
+          <article class="pricing-card">
+            <h3>Enterprise</h3>
+            <div class="price">Custom</div>
+            <p>For multi-unit operators and central kitchen teams.</p>
+            <ul class="pricing-list">
+              <li><span class="check">✓</span><span>Multi-location support</span></li>
+              <li><span class="check">✓</span><span>Advanced permissions</span></li>
+              <li><span class="check">✓</span><span>Priority onboarding</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <span>Proof</span>
+          <h2>Made for operators who care about margin.</h2>
+          <p>
+            Replace these with real customer quotes after you start onboarding users.
+          </p>
+        </div>
+
+        <div class="testimonial-grid">
+          <article class="testimonial">
+            <p>
+              “We priced our menu off rough numbers before. Chef's Ledger gave us a clean cost structure and showed where we were losing margin.”
+            </p>
+            <div class="person">Maria L.</div>
+            <div class="role">Executive Chef, Neighborhood Bistro</div>
+          </article>
+
+          <article class="testimonial">
+            <p>
+              “Inventory counts stopped feeling disconnected from recipe cost. Our team finally had one source for both.”
+            </p>
+            <div class="person">David R.</div>
+            <div class="role">Kitchen Manager, Catering Group</div>
+          </article>
+
+          <article class="testimonial">
+            <p>
+              “The menu pricing view helped us adjust three underpriced dishes in one review session.”
+            </p>
+            <div class="person">Aisha T.</div>
+            <div class="role">Owner, Fast Casual Brand</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <span>FAQ</span>
+          <h2>Answers for your launch page.</h2>
+          <p>
+            Edit these based on your product stage and rollout plan.
+          </p>
+        </div>
+
+        <div class="faq-grid">
+          <article class="faq-item">
+            <h3>Who is Chef's Ledger for?</h3>
+            <p>
+              Independent chefs, restaurant owners, catering teams, food trucks, and multi-unit food businesses.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h3>Does it support inventory and recipes?</h3>
+            <p>
+              Yes. The product is designed to connect recipe costing, inventory awareness, and menu pricing.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h3>How do I get started?</h3>
+            <p>
+              Join the waitlist, request a demo, or launch a free plan based on your rollout.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="cta">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Stop losing margin to guesswork.</h2>
+          <p>
+            Launch Chef's Ledger with a clear message. Show chefs and operators how they can cost recipes, control inventory, and price with confidence.
+          </p>
+          <div class="hero-actions" style="justify-content:center; margin-bottom:0;">
+            <a class="btn btn-primary" href="mailto:hello@chefsledger.com">Request a Demo</a>
+            <a class="btn btn-secondary" href="#top">Back to Top</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <div>© 2026 Chef's Ledger. All rights reserved.</div>
+      <div>Built for modern kitchen operations.</div>
+    </div>
+  </footer>
+</body>
+</html>
